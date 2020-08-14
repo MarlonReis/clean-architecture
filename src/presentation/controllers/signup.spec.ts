@@ -1,9 +1,13 @@
 import { SingUpController } from './signup'
 import { MissingParamError } from '../error/missing-param-error'
 
+const makeSutFactory = (): SingUpController => {
+  return new SingUpController()
+}
+
 describe('SingUp controller', () => {
   test('Should be return http status 400 when no name is provided', () => {
-    const sut = new SingUpController()
+    const sut = makeSutFactory()
     const httpRequest = {
       body: {
         email: 'exemple@email.com.br',
@@ -19,7 +23,7 @@ describe('SingUp controller', () => {
     }))
   })
   test('Should be return http status 400 when no email is provided', () => {
-    const sut = new SingUpController()
+    const sut = makeSutFactory()
     const httpRequest = {
       body: {
         name: 'Any Name',
@@ -36,7 +40,7 @@ describe('SingUp controller', () => {
   })
 
   test('Should be return http status 400 when no password is provided', () => {
-    const sut = new SingUpController()
+    const sut = makeSutFactory()
     const httpRequest = {
       body: {
         name: 'Any Name',
@@ -52,7 +56,7 @@ describe('SingUp controller', () => {
   })
 
   test('Should be return http status 400 when no password confirmation is provided', () => {
-    const sut = new SingUpController()
+    const sut = makeSutFactory()
     const httpRequest = {
       body: {
         name: 'Any Name',
