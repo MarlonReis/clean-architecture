@@ -13,8 +13,10 @@ describe('SingUp controller', () => {
     }
 
     const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse).toEqual(expect.objectContaining({ statusCode: 400 }))
-    expect(httpResponse).toEqual(expect.objectContaining({ body: new MissingParamError('name') }))
+    expect(httpResponse).toEqual(expect.objectContaining({
+      statusCode: 400,
+      body: new MissingParamError('name')
+    }))
   })
   test('Should be return http status 400 when no email is provided', () => {
     const sut = new SingUpController()
