@@ -12,6 +12,7 @@ describe('SingUp controller', () => {
     }
 
     const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse).toEqual(expect.objectContaining({ statusCode: 400 }))
+    expect(httpResponse).toEqual(expect.objectContaining({ body: new Error('Missing param: name') }))
   })
 })
