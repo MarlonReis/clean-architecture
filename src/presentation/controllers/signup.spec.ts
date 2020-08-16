@@ -12,14 +12,26 @@ interface SutTypes {
   emailValidatorStub: EmailValidator
 }
 
-const makeSutFactory = (): SutTypes => {
+const makeEmailValidatorFactory = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid = (email: string): boolean => {
       return true
     }
   }
+  return new EmailValidatorStub()
+}
 
-  const emailValidatorStub = new EmailValidatorStub()
+const makeEmailValidatorWithError500Factory = (): EmailValidator => {
+  class EmailValidatorStub implements EmailValidator {
+    isValid = (email: string): boolean => {
+      throw new ServerError()
+    }
+  }
+  return new EmailValidatorStub()
+}
+
+const makeSutFactory = (): SutTypes => {
+  const emailValidatorStub = makeEmailValidatorFactory()
   const sut = new SingUpController(emailValidatorStub)
   return { sut, emailValidatorStub }
 }
@@ -130,14 +142,7 @@ describe('SingUp controller', () => {
   })
 
   test('Should be return status http 500 when emailValidate throws exceptions', () => {
-    class EmailValidatorStub implements EmailValidator {
-      isValid = (email: string): boolean => {
-        throw new ServerError()
-      }
-    }
-
-    const emailValidatorStub = new EmailValidatorStub()
-    const sut = new SingUpController(emailValidatorStub)
+    const sut = new SingUpController(makeEmailValidatorWithError500Factory())
 
     const httpRequest = {
       body: {
