@@ -13,7 +13,8 @@ import {
 
 import {
   badRequest,
-  serverError
+  serverError,
+  created
 } from '../../helper/http-helper'
 
 export class SingUpController implements Controller {
@@ -44,7 +45,7 @@ export class SingUpController implements Controller {
       }
 
       const account = this.addAccount.add({ name, email, password })
-      return { statusCode: 201, body: account }
+      return created(account)
     } catch (error) {
       return serverError()
     }
