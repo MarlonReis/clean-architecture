@@ -21,15 +21,6 @@ const makeEmailValidatorFactory = (): EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeEmailValidatorWithError500Factory = (): EmailValidator => {
-  class EmailValidatorStub implements EmailValidator {
-    isValid = (email: string): boolean => {
-      throw new ServerError()
-    }
-  }
-  return new EmailValidatorStub()
-}
-
 const makeSutFactory = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorFactory()
   const sut = new SingUpController(emailValidatorStub)
@@ -142,7 +133,10 @@ describe('SingUp controller', () => {
   })
 
   test('Should be return status http 500 when emailValidate throws exceptions', () => {
-    const sut = new SingUpController(makeEmailValidatorWithError500Factory())
+    const { sut, emailValidatorStub } = makeSutFactory()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new ServerError()
+    })
 
     const httpRequest = {
       body: {
