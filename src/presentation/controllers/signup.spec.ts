@@ -78,6 +78,24 @@ describe('SingUp controller', () => {
     }))
   })
 
+  test('Should be return http status 400 when no password confirmation fail', () => {
+    const { sut } = makeSutFactory()
+    const httpRequest = {
+      body: {
+        name: 'Any Name',
+        email: 'exemple@email.com',
+        password: '4nyP4ssW0rd',
+        passwordConfirmation: 'D1f3r3nt@Pwd'
+      }
+    }
+
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(expect.objectContaining({
+      statusCode: 400,
+      body: new InvalidParamError('passwordConfirmation')
+    }))
+  })
+
   test('Should be return http status 400 when no password confirmation is provided', () => {
     const { sut } = makeSutFactory()
     const httpRequest = {
