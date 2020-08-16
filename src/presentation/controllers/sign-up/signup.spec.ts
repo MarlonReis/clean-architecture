@@ -237,4 +237,28 @@ describe('SingUp controller addAccount', () => {
       body: new ServerError()
     }))
   })
+
+  test('Should be return status http 201 when addAccount successfully', () => {
+    const { sut } = makeSutFactory()
+
+    const httpRequest = {
+      body: {
+        name: 'valid name',
+        email: 'valid@email.com',
+        password: 'valid_pwd',
+        passwordConfirmation: 'valid_pwd'
+      }
+    }
+
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(expect.objectContaining({
+      statusCode: 201,
+      body: {
+        id: 'valid_id',
+        name: 'valid name',
+        email: 'valid@email.com',
+        password: 'valid_pwd'
+      }
+    }))
+  })
 })
