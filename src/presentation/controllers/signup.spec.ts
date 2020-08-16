@@ -6,11 +6,8 @@ import {
 } from '../error'
 
 import { EmailValidator } from '../protocols'
-
-interface SutTypes {
-  sut: SingUpController
-  emailValidatorStub: EmailValidator
-}
+import { AccountModel } from '../../domain/models/account'
+import { AddAccount, AddAccountModel } from '../../domain/usercase/add-account'
 
 const makeEmailValidatorFactory = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
@@ -21,13 +18,35 @@ const makeEmailValidatorFactory = (): EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeSutFactory = (): SutTypes => {
-  const emailValidatorStub = makeEmailValidatorFactory()
-  const sut = new SingUpController(emailValidatorStub)
-  return { sut, emailValidatorStub }
+const makeAddAccountFactory = (): AddAccount => {
+  class AddAccountStub implements AddAccount {
+    add = (account: AddAccountModel): AccountModel => {
+      const fakeAccount: AccountModel = {
+        id: 'valid_id',
+        name: 'valid name',
+        email: 'valid@email.com',
+        password: 'valid_pwd'
+      }
+      return fakeAccount
+    }
+  }
+  return new AddAccountStub()
 }
 
-describe('SingUp controller', () => {
+interface SutTypes {
+  sut: SingUpController
+  emailValidatorStub: EmailValidator
+  addAccountStub: AddAccount
+}
+
+const makeSutFactory = (): SutTypes => {
+  const emailValidatorStub = makeEmailValidatorFactory()
+  const addAccountStub = makeAddAccountFactory()
+  const sut = new SingUpController(emailValidatorStub, addAccountStub)
+  return { sut, emailValidatorStub, addAccountStub }
+}
+
+describe('SingUp controller validations', () => {
   test('Should be return http status 400 when no name is provided', () => {
     const { sut } = makeSutFactory()
     const httpRequest = {
@@ -170,5 +189,27 @@ describe('SingUp controller', () => {
       statusCode: 500,
       body: new ServerError()
     }))
+  })
+})
+
+describe('SingUp controller addAccount', () => {
+  test('Should be call addAccount with correct values', () => {
+    const { sut, addAccountStub } = makeSutFactory()
+    const addStubSpy = jest.spyOn(addAccountStub, 'add')
+    const httpRequest = {
+      body: {
+        name: 'Any Name',
+        email: 'any-valid@email.com',
+        password: '4nyP4ssW0rd',
+        passwordConfirmation: '4nyP4ssW0rd'
+      }
+    }
+
+    sut.handle(httpRequest)
+    expect(addStubSpy).toHaveBeenCalledWith({
+      name: 'Any Name',
+      email: 'any-valid@email.com',
+      password: '4nyP4ssW0rd'
+    })
   })
 })
