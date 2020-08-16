@@ -15,11 +15,15 @@ import {
   serverError
 } from '../helper/http-helper'
 
-export class SingUpController implements Controller {
-  private readonly emailValidator: EmailValidator;
+import { AddAccount } from '../../domain/usercase/add-account'
 
-  constructor (emailValidator: EmailValidator) {
+export class SingUpController implements Controller {
+  private readonly emailValidator: EmailValidator
+  private readonly addAccount: AddAccount
+
+  constructor (emailValidator: EmailValidator, addAccount: AddAccount) {
     this.emailValidator = emailValidator
+    this.addAccount = addAccount
   }
 
   handle = (httpRequest: HttpRequest): HttpResponse => {
@@ -31,7 +35,7 @@ export class SingUpController implements Controller {
         }
       }
 
-      const { email, password, passwordConfirmation } = httpRequest.body
+      const { email, name, password, passwordConfirmation } = httpRequest.body
       if (password !== passwordConfirmation) {
         return badRequest(new InvalidParamError('passwordConfirmation'))
       }
@@ -39,9 +43,10 @@ export class SingUpController implements Controller {
       if (!this.emailValidator.isValid(email)) {
         return badRequest(new InvalidParamError('email'))
       }
+
+      this.addAccount.add({ name, email, password })
     } catch (error) {
       return serverError()
     }
-    return badRequest(new MissingParamError('email'))
   }
 }
