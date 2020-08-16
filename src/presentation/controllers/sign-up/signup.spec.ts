@@ -215,4 +215,26 @@ describe('SingUp controller addAccount', () => {
       password: '4nyP4ssW0rd'
     })
   })
+
+  test('Should be return status http 500 when addAccount throws exceptions', () => {
+    const { sut, addAccountStub } = makeSutFactory()
+    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const httpRequest = {
+      body: {
+        name: 'Any Name',
+        email: 'any-valid@email.com',
+        password: '4nyP4ssW0rd',
+        passwordConfirmation: '4nyP4ssW0rd'
+      }
+    }
+
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(expect.objectContaining({
+      statusCode: 500,
+      body: new ServerError()
+    }))
+  })
 })
