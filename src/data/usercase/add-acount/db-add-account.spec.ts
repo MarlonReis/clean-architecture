@@ -1,16 +1,30 @@
 import { DbAddAccount } from './db-add-account'
 import { Encryption } from '../../protocols/encryption'
 
-describe('DbAddAccount UseCase', () => {
+interface SutTypes {
+    sut: DbAddAccount
+    encryptionStub: Encryption
+}
+
+const makeEncryptionStubFactory = (): Encryption => {
     class EncryptionStub implements Encryption {
-       async encrypt (data: string): Promise<string> {
+        async encrypt (data: string): Promise<string> {
             return Promise.resolve('hash_password_valid')
         }
     }
+    return new EncryptionStub()
+}
 
+const makeSutFactory = (): SutTypes => {
+    const encryptionStub = makeEncryptionStubFactory()
+    const sut = new DbAddAccount(encryptionStub)
+    return { sut, encryptionStub }
+}
+
+describe('DbAddAccount UseCase', () => {
     test('Should be call Encrypt with correct password', async () => {
-        const encryptionStub = new EncryptionStub()
-        const sut = new DbAddAccount(encryptionStub)
+        const { encryptionStub, sut } = makeSutFactory()
+
         const encryptSpy = jest.spyOn(encryptionStub, 'encrypt')
         await sut.add({
             name: 'Valid Name',
