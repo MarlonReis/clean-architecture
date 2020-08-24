@@ -38,7 +38,7 @@ const makeSutFactory = (): SutTypes => {
     return { sut, encryptionStub, addAccountRepositoryStub }
 }
 
-describe('DbAddAccount UseCase', () => {
+describe('DbAddAccount UseCase with Encryption', () => {
     test('Should be call Encrypt with correct password', async () => {
         const { encryptionStub, sut } = makeSutFactory()
 
@@ -61,7 +61,9 @@ describe('DbAddAccount UseCase', () => {
         })
         await expect(accountPromise).rejects.toThrow()
     })
+})
 
+describe('DbAddAccount UseCase with AddAccountRepository', () => {
     test('Should be call addAccountRepository with correct account', async () => {
         const { addAccountRepositoryStub, sut } = makeSutFactory()
         const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
@@ -74,6 +76,33 @@ describe('DbAddAccount UseCase', () => {
         await expect(addSpy).toHaveBeenCalledWith({
             ...accountData,
             password: 'hash_password_valid'
+        })
+    })
+
+    test('Should be throws when AddAccountRepository throws error', async () => {
+        const { addAccountRepositoryStub, sut } = makeSutFactory()
+        jest.spyOn(addAccountRepositoryStub, 'add').mockReturnValueOnce(Promise.reject(new Error()))
+        const accountPromise = sut.add({
+            name: 'Valid Name',
+            email: 'valid@email.com',
+            password: 'V4l1d@Pwd'
+        })
+        await expect(accountPromise).rejects.toThrow()
+    })
+
+    test('Should be return an account on success', async () => {
+        const { sut } = makeSutFactory()
+        const account = await sut.add({
+            name: 'Valid Name',
+            email: 'valid@email.com',
+            password: 'V4l1d@Pwd'
+        })
+
+        expect(account).toEqual({
+             id: 'valid_id',
+             name: 'Valid Name',
+             email: 'valid@email.com',
+             password: 'hash_password_valid'
         })
     })
 })
