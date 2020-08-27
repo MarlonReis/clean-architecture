@@ -23,8 +23,10 @@
   },
   "homepage": "https://github.com/MarlonReis/NodeJsCleanArchitecture#readme",
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.2.2",
     "@types/bcrypt": "^3.0.0",
     "@types/jest": "^26.0.9",
+    "@types/mongodb": "^3.5.26",
     "@types/node": "^14.0.27",
     "@types/validator": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
@@ -44,6 +46,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
+    "mongodb": "^3.6.0",
     "validator": "^13.1.1"
   }
 }
