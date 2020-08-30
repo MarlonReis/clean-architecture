@@ -5,11 +5,16 @@ describe('Account Mongo Repository', () => {
     beforeAll(async () => {
         await MongoHelper.connect(process.env.MONGO_URL)
     })
+
     afterAll(async () => {
         await MongoHelper.disconnect()
     })
+
+    const makeSutAccountMongoRepositoryFactory = (): AccountMongoRepository => {
+        return new AccountMongoRepository()
+    }
     test('Should be return and account on success', async () => {
-        const sut = new AccountMongoRepository()
+        const sut = makeSutAccountMongoRepositoryFactory()
         const account = await sut.add({
             name: 'Any Name',
             email: 'any@email.com',
